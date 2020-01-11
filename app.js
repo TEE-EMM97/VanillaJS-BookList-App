@@ -8,23 +8,56 @@ class Book {
     }
 }
 
+// Storagew Class: Handles Storage
+class Store {
+    static getBooks(){
+        let books;
+        if(localStorage.getitem('books') === null){
+            books = [];
+        }else {
+            books = JSON.parse(localStorage.getItem('books'));
+        }
+
+        return books
+    }
+    static addBook(books){
+        const books = Store.getBooks();
+
+        books.push(book);
+
+        localStorage.setItem('books', JSON.stringify(books));
+    }
+
+    static removeBook(isbn){
+        const books = Store.getBooks();
+
+        books.forEach((book, index) => {
+            if(book.isbn === isbn){
+                books.splice(index, 1)
+            }
+        });
+
+        localStorage.setItem('books', JSON.stringify(books));
+    }
+}
+
 //UI Class: Hamdle UI Tasks
 class UI {
     static displayBooks(){
-      const StoreBooks = [
-      {
-         title: 'Book One',
-         author: 'John Doe',
-         isbn: '3434434' 
-      },
-      {
-         title: 'Book One',
-         author: 'John Doe',
-         isbn: '3434434'  
-      }
-      ]; 
+    //   const StoreBooks = [
+    //   {
+    //      title: 'Book One',
+    //      author: 'John Doe',
+    //      isbn: '3434434' 
+    //   },
+    //   {
+    //      title: 'Book One',
+    //      author: 'John Doe',
+    //      isbn: '3434434'  
+    //   }
+    //   ]; 
       
-      const books = StoreBooks;
+      const books = Store.getBooks();;
 
       books.forEach((book) => UI.addBookToList(book));      
     }
@@ -95,6 +128,9 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
         //Add Book to UI 
         UI.addBookToList(book);
 
+        //Add Book to Store
+        Store.addBook(book);
+
         // Show Sucess Message
         UI.showAlert('Booked Added', 'success');
     
@@ -106,5 +142,11 @@ document.querySelector('#book-form').addEventListener('submit', (e) => {
 
 //Event: Remove a Book
 document.querySelector('#book-list').addEventListener('click', (e) => {
+    //Remove from Storaage
+    Store.removeBook(e.target.parentElement.previousElementSibling.textContent);
+
+    // Remove from UI 
     deleteBook(e.target)
+
+    UI.showAlert("Removal of Book was success", 'success')
 })
